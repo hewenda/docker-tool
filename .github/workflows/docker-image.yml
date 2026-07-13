@@ -33,4 +33,6 @@ jobs:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
           push: true
-          tags: foxesin/${{ matrix.name }}:latest
+          tags: |
+            foxesin/${{ matrix.name }}:latest
+            foxesin/${{ matrix.name }}:build-${{ github.run_number }}
