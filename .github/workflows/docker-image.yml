@@ -16,10 +16,6 @@ jobs:
             context: ./base-tool
             dockerfile: ./base-tool/Dockerfile
 
-          - name: gophernotes
-            context: ./gophernotes
-            dockerfile: ./gophernotes/Dockerfile
-
     steps:
       - uses: actions/checkout@v4
 
