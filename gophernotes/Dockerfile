@@ -1,4 +1,4 @@
-FROM gopherdata/gophernotes:latest-ds
+FROM gopherdata/gophernotes:latest
 
 ENV TZ=Asia/Shanghai
 
