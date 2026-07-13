@@ -1,7 +1,5 @@
 FROM gopherdata/gophernotes:latest-ds
 
-USER root
-
 ENV TZ=Asia/Shanghai
 
 RUN apk update && \
