@@ -15,6 +15,9 @@ jobs:
           - name: tool
             context: ./base-tool
             dockerfile: ./base-tool/Dockerfile
+          - name: openvpn
+            context: ./openvpn
+            dockerfile: ./openvpn/Dockerfile
 
     steps:
       - uses: actions/checkout@v4
