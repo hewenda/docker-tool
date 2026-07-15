@@ -5,4 +5,5 @@ RUN apk add --no-cache \
     ca-certificates \
     tzdata
 
-CMD ["openvpn", "--config", "/vpn/client.ovpn"]
+ENTRYPOINT ["openvpn"]
+CMD ["--config", "/vpn/client.ovpn"]
