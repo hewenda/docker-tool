@@ -5,10 +5,7 @@ ENV TZ=Asia/Shanghai
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
-ARG USERNAME=deck
-ARG USER_UID=1000
-
-
+# 基础工具
 RUN apt update && apt install -y \
     tzdata \
     zsh \
@@ -41,6 +38,8 @@ RUN apt update && apt install -y \
     autojump \
     less \
     file \
+    openssh-client \
+    rsync \
     && ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo ${TZ} > /etc/timezone \
     && dpkg-reconfigure -f noninteractive tzdata \
@@ -49,49 +48,50 @@ RUN apt update && apt install -y \
     && rm -rf /var/lib/apt/lists/*
 
 
-# 创建与 SteamOS 一致用户
-RUN useradd \
-    --create-home \
-    --shell /bin/zsh \
-    --uid ${USER_UID} \
-    ${USERNAME} \
-    && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME}
-
-
-USER ${USERNAME}
-
-ENV HOME=/home/${USERNAME}
-ENV NVM_DIR=/home/${USERNAME}/.nvm
-
-WORKDIR /home/${USERNAME}/project
-
-
-# Oh My Zsh
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-
-
-# zsh 插件
+#
+# Oh My Zsh 系统安装
+#
 RUN git clone \
-    https://github.com/zsh-users/zsh-autosuggestions \
-    ${HOME}/.oh-my-zsh/custom/plugins/zsh-autosuggestions \
+    https://github.com/ohmyzsh/ohmyzsh.git \
+    /opt/oh-my-zsh
+
+
+#
+# zsh 插件
+#
+RUN mkdir -p /opt/zsh-plugins \
     && git clone \
-    https://github.com/zsh-users/zsh-syntax-highlighting.git \
-    ${HOME}/.ohmyzsh/custom/plugins/zsh-syntax-highlighting || true
-
-
-# 修正路径（上面的目录修正）
-RUN rm -rf ${HOME}/.ohmyzsh/custom/plugins/zsh-syntax-highlighting \
+       https://github.com/zsh-users/zsh-autosuggestions.git \
+       /opt/zsh-plugins/zsh-autosuggestions \
     && git clone \
-    https://github.com/zsh-users/zsh-syntax-highlighting.git \
-    ${HOME}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+       https://github.com/zsh-users/zsh-syntax-highlighting.git \
+       /opt/zsh-plugins/zsh-syntax-highlighting
 
 
-# nvm + Node LTS + yarn
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash \
+#
+# nvm
+#
+ENV NVM_DIR=/opt/nvm
+
+RUN mkdir -p ${NVM_DIR} \
+    && git clone \
+       https://github.com/nvm-sh/nvm.git \
+       ${NVM_DIR} \
+    && cd ${NVM_DIR} \
+    && git checkout $(git describe --abbrev=0 --tags) \
     && . ${NVM_DIR}/nvm.sh \
     && nvm install --lts \
     && nvm alias default lts/* \
     && npm install -g yarn
+
+
+#
+# 项目目录
+#
+RUN mkdir -p /workspace
+
+
+WORKDIR /workspace
 
 
 CMD ["zsh"]
