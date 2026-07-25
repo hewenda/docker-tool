@@ -9,7 +9,6 @@ ARG USERNAME=deck
 ARG USER_UID=1000
 
 
-# 基础环境
 RUN apt update && apt install -y \
     tzdata \
     zsh \
@@ -40,8 +39,8 @@ RUN apt update && apt install -y \
     jq \
     tree \
     autojump \
-    file \
     less \
+    file \
     && ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo ${TZ} > /etc/timezone \
     && dpkg-reconfigure -f noninteractive tzdata \
@@ -50,7 +49,7 @@ RUN apt update && apt install -y \
     && rm -rf /var/lib/apt/lists/*
 
 
-# 创建与 SteamOS 一致的用户
+# 创建与 SteamOS 一致用户
 RUN useradd \
     --create-home \
     --shell /bin/zsh \
@@ -62,10 +61,12 @@ RUN useradd \
 USER ${USERNAME}
 
 ENV HOME=/home/${USERNAME}
+ENV NVM_DIR=/home/${USERNAME}/.nvm
+
 WORKDIR /home/${USERNAME}/project
 
 
-# 安装 Oh My Zsh
+# Oh My Zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
 
@@ -75,30 +76,22 @@ RUN git clone \
     ${HOME}/.oh-my-zsh/custom/plugins/zsh-autosuggestions \
     && git clone \
     https://github.com/zsh-users/zsh-syntax-highlighting.git \
+    ${HOME}/.ohmyzsh/custom/plugins/zsh-syntax-highlighting || true
+
+
+# 修正路径（上面的目录修正）
+RUN rm -rf ${HOME}/.ohmyzsh/custom/plugins/zsh-syntax-highlighting \
+    && git clone \
+    https://github.com/zsh-users/zsh-syntax-highlighting.git \
     ${HOME}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
 
 
-# nvm
-ENV NVM_DIR=/home/${USERNAME}/.nvm
-
+# nvm + Node LTS + yarn
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash \
     && . ${NVM_DIR}/nvm.sh \
     && nvm install --lts \
     && nvm alias default lts/* \
     && npm install -g yarn
-
-
-# 复制 zsh 配置
-COPY --chown=${USERNAME}:${USERNAME} .zshrc ${HOME}/.zshrc
-
-
-# distrobox 会注入宿主 code 命令
-# 创建占位命令避免部分环境检测失败
-RUN mkdir -p ${HOME}/.local/bin \
-    && ln -sf /usr/bin/true ${HOME}/.local/bin/code
-
-
-ENV PATH=${HOME}/.local/bin:${PATH}
 
 
 CMD ["zsh"]
