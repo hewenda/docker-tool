@@ -18,6 +18,9 @@ jobs:
           - name: openvpn
             context: ./openvpn
             dockerfile: ./openvpn/Dockerfile
+        - name:  develop
+            context: ./develop
+            dockerfile: ./develop/Dockerfile
 
     steps:
       - uses: actions/checkout@v4
