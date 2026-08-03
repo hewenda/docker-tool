@@ -49,49 +49,32 @@ RUN apt update && apt install -y \
 
 
 #
-# Oh My Zsh 系统安装
+# zsh 安装脚本（手动触发）
 #
-RUN git clone \
-    https://github.com/ohmyzsh/ohmyzsh.git \
-    /opt/oh-my-zsh
-
-
-#
-# zsh 插件
-#
-RUN mkdir -p /opt/zsh-plugins \
-    && git clone \
-       https://github.com/zsh-users/zsh-autosuggestions.git \
-       /opt/zsh-plugins/zsh-autosuggestions \
-    && git clone \
-       https://github.com/zsh-users/zsh-syntax-highlighting.git \
-       /opt/zsh-plugins/zsh-syntax-highlighting
+COPY ./develop/install-zsh.sh /usr/local/bin/install-zsh.sh
+RUN chmod +x /usr/local/bin/install-zsh.sh
 
 
 #
-# nvm
+# nvs
 #
-ENV NVM_DIR=/opt/nvm
+ENV NVS_HOME=${HOME}/.nvs
 
-RUN mkdir -p ${NVM_DIR} \
-    && git clone \
-       https://github.com/nvm-sh/nvm.git \
-       ${NVM_DIR} \
-    && cd ${NVM_DIR} \
-    && git checkout $(git describe --abbrev=0 --tags) \
-    && . ${NVM_DIR}/nvm.sh \
-    && nvm install --lts \
-    && nvm alias default lts/* \
-    && npm install -g yarn
+RUN git clone --depth=1 \
+    https://github.com/jasongin/nvs.git \
+    ${NVS_HOME} \
+    && . ${NVS_HOME}/nvs.sh \
+    && nvs add lts \
+    && nvs use lts
 
-
-#
-# 项目目录
-#
-RUN mkdir -p /workspace
+RUN curl -fsSL https://yarnpkg.com/latest.tar.gz -o /tmp/yarn.tar.gz \
+    && mkdir -p /opt/yarn \
+    && tar -xzf /tmp/yarn.tar.gz -C /opt/yarn --strip-components=1 \
+    && ln -sf /opt/yarn/bin/yarn /usr/local/bin/yarn \
+    && ln -sf /opt/yarn/bin/yarnpkg /usr/local/bin/yarnpkg \
 
 
-WORKDIR /workspace
+WORKDIR ${HOME}
 
 
-CMD ["zsh"]
+CMD ["bash"]
