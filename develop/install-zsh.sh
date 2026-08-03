@@ -29,17 +29,11 @@ if [[ ! -f "$HOME/.zshrc" ]]; then
     cp "$ZSH/templates/zshrc.zsh-template" "$HOME/.zshrc"
 fi
 
-
+echo '--- set zsh plugin and theme ---'
 echo 'set: ZSH_THEME="powerlevel10k/powerlevel10k"'
 echo 'set: plugins=(git zsh-autosuggestions zsh-syntax-highlighting)'
+echo '---'
 
-
-# nvs init
-echo "Initializing nvs in .zshrc"
-echo 'set: [ -f "$HOME/.nvs/nvs.sh" ] && . "$HOME/.nvs/nvs.sh"'
-echo 'set: nvs use lts >/dev/null 2>&1 || true'
-
-echo ''
 
 echo "Oh My Zsh installed at: $ZSH"
 echo "Plugins installed at: $PLUGIN_DIR"

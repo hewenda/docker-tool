@@ -56,22 +56,13 @@ RUN chmod +x /usr/local/bin/install-zsh.sh
 
 
 #
-# nvs
+# volta
 #
-ENV NVS_HOME=${HOME}/.nvs
+ENV VOLTA_HOME=${HOME}/.volta
+ENV PATH=${VOLTA_HOME}/bin:${PATH}
 
-RUN git clone --depth=1 \
-    https://github.com/jasongin/nvs.git \
-    ${NVS_HOME} \
-    && . ${NVS_HOME}/nvs.sh \
-    && nvs add lts \
-    && nvs use lts
-
-RUN curl -fsSL https://yarnpkg.com/latest.tar.gz -o /tmp/yarn.tar.gz \
-    && mkdir -p /opt/yarn \
-    && tar -xzf /tmp/yarn.tar.gz -C /opt/yarn --strip-components=1 \
-    && ln -sf /opt/yarn/bin/yarn /usr/local/bin/yarn \
-    && ln -sf /opt/yarn/bin/yarnpkg /usr/local/bin/yarnpkg \
+RUN curl -fsSL https://get.volta.sh | bash -s -- --skip-setup \
+    && ${VOLTA_HOME}/bin/volta install node@lts yarn
 
 
 WORKDIR ${HOME}
