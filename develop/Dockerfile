@@ -77,4 +77,4 @@ RUN curl -fsSL https://yarnpkg.com/latest.tar.gz -o /tmp/yarn.tar.gz \
 WORKDIR ${HOME}
 
 
-CMD ["bash"]
+CMD ["zsh"]
