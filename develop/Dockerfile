@@ -51,7 +51,7 @@ RUN apt update && apt install -y \
 #
 # zsh 安装脚本（手动触发）
 #
-COPY ./develop/install-zsh.sh /usr/local/bin/install-zsh.sh
+COPY ./install-zsh.sh /usr/local/bin/install-zsh.sh
 RUN chmod +x /usr/local/bin/install-zsh.sh
 
 
